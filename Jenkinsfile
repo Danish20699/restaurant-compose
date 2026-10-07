@@ -1,86 +1,94 @@
 pipeline {
     agent any
-
     environment {
-        IMAGE_NAME = 'danishdopsa/restaurant-app'
-        STAGING_IP = '192.168.56.101'
-        PROD_IP    = '192.168.56.102'
+        DOCKER_USER = "danishdopsa"
+        VM_USER = "verjenkins"
+        STAGING_IP = "192.168.56.101"
+        PROD_IP = "192.168.56.102" 
+        DOCKER_CREDS_ID = "docker-hub-pat"
+        SSH_CREDS_ID = "vm-ssh-key"
+        TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
-        stage('1. Checkout Code') {
+        stage('Build & Push') {
             steps {
-                echo 'Checking out code from GitHub...'
-                checkout scm
-            }
-        }
-
-        stage('2. Build Docker Image') {
-            steps {
-                echo "Building Docker image: ${IMAGE_NAME}:v${BUILD_NUMBER}"
-                sh "docker build -t ${IMAGE_NAME}:v${BUILD_NUMBER} ."
-                sh "docker tag ${IMAGE_NAME}:v${BUILD_NUMBER} ${IMAGE_NAME}:latest"
-            }
-        }
-
-        stage('3. Push to Docker Hub') {
-            steps {
-                echo 'Authenticating and pushing image to Docker Hub...'
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
-                    sh 'echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin'
-                    sh "docker push ${IMAGE_NAME}:v${BUILD_NUMBER}"
-                    sh "docker push ${IMAGE_NAME}:latest"
+                script {
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDS_ID, passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                        
+                        // Build & Push single image artifact for both environments
+                        sh "docker build -t ${DOCKER_USER}/restaurant-app:v${TAG} ."
+                        sh "docker push ${DOCKER_USER}/restaurant-app:v${TAG}"
+                    }
                 }
             }
         }
 
-        stage('4. Deploy to Staging') {
+        stage('Create Environment File') {
             steps {
-                echo "Deploying to Staging VM (${STAGING_IP})..."
-                withCredentials([sshUserPrivateKey(credentialsId: 'verjenkins-ssh', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([string(credentialsId: 'restaurant-app-PGPASS', variable: 'DB_PASS')]) {
                     sh """
-                        ssh -i \$SSH_KEY -o StrictHostKeyChecking=no verjenkins@${STAGING_IP} "mkdir -p ~/app/db"
-                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no docker-compose.yml verjenkins@${STAGING_IP}:~/app/
-                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no db/init.sql verjenkins@${STAGING_IP}:~/app/db/
-                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no .env.example verjenkins@${STAGING_IP}:~/app/.env
-                        ssh -i \$SSH_KEY -o StrictHostKeyChecking=no verjenkins@${STAGING_IP} "cd ~/app && DOCKER_IMAGE=${IMAGE_NAME}:v${BUILD_NUMBER} docker compose pull && DOCKER_IMAGE=${IMAGE_NAME}:v${BUILD_NUMBER} docker compose up -d"
+                        cat << EOF > .env
+PGHOST=restaurant-db
+PGDATABASE=restaurant_db
+PGUSER=postgres
+PGPASSWORD=${DB_PASS}
+PGPORT=5432
+HOST_PORT=8081
+EOF
                     """
                 }
-                echo "✅ Staging deployed! Accessible at http://${STAGING_IP}:8080"
             }
         }
 
-        stage('5. Manual Approval Gate') {
+        stage('Deploy to Staging') {
             steps {
-                echo "Waiting for team review of Staging..."
-                input message: "Staging is live at http://${STAGING_IP}:8080! Ready to promote to Production?",
-                      ok: "Deploy to Production"
-            }
-        }
-
-        stage('6. Deploy to Production') {
-            steps {
-                echo "Promoting to Production VM (${PROD_IP})..."
-                withCredentials([sshUserPrivateKey(credentialsId: 'verjenkins-ssh', keyFileVariable: 'SSH_KEY')]) {
+                sshagent([SSH_CREDS_ID]) {
+                    // 1. Remove remote db directory to ensure clean folder creation
+                    sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} 'rm -rf ~/db'"
+                    
+                    // 2. Transfer fresh compose, .env, and db/ directory
+                    sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${STAGING_IP}:~/"
+                    
                     sh """
-                        ssh -i \$SSH_KEY -o StrictHostKeyChecking=no verjenkins@${PROD_IP} "mkdir -p ~/app/db"
-                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no docker-compose.yml verjenkins@${PROD_IP}:~/app/
-                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no db/init.sql verjenkins@${PROD_IP}:~/app/db/
-                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no .env.example verjenkins@${PROD_IP}:~/app/.env
-                        ssh -i \$SSH_KEY -o StrictHostKeyChecking=no verjenkins@${PROD_IP} "cd ~/app && DOCKER_IMAGE=${IMAGE_NAME}:v${BUILD_NUMBER} docker compose pull && DOCKER_IMAGE=${IMAGE_NAME}:v${BUILD_NUMBER} docker compose up -d"
+                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} '
+                            docker rm -f restaurant-db restaurant-web restaurant-app 2>/dev/null || true
+                            docker volume rm verjenkins_db-data 2>/dev/null || true
+                            
+                            export TAG=${TAG}
+                            export DOCKER_USER=${DOCKER_USER}
+                            docker compose pull
+                            docker compose up -d --remove-orphans
+                        '
                     """
                 }
-                echo "🚀 LIVE IN PRODUCTION! Accessible at http://${PROD_IP}:8080"
             }
         }
-    }
 
-    post {
-        success {
-            echo "🎉 Complete CI/CD Pipeline executed successfully!"
+        stage('Approval Gate') {
+            steps {
+                input message: "Verify Staging environment at http://${STAGING_IP}:8081. Promote to Production?", ok: "Deploy!"
+            }
         }
-        failure {
-            echo "❌ Pipeline failed! Check console output for logs."
+
+        stage('Deploy to Production') {
+            steps {
+                sshagent([SSH_CREDS_ID]) {
+                    sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${PROD_IP} 'rm -rf ~/db'"
+                    sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${PROD_IP}:~/"
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${PROD_IP} '
+                            docker rm -f restaurant-db restaurant-web restaurant-app 2>/dev/null || true
+                            
+                            export TAG=${TAG}
+                            export DOCKER_USER=${DOCKER_USER}
+                            docker compose pull
+                            docker compose up -d --remove-orphans
+                        '
+                    """
+                }
+            }
         }
     }
 }

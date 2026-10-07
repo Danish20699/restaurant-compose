@@ -1,24 +1,25 @@
 services:
   restaurant-web:
-    build: .
-    image: ${DOCKER_IMAGE:-danish20699/restaurant-app:latest}
+    image: ${DOCKER_USER:-danishdopsa}/restaurant-app:v${TAG}
+    container_name: restaurant-web
     ports:
-      - "${HOST_PORT:-8080}:80"
+      - "${HOST_PORT:-8081}:80"
     environment:
-      PGHOST: restaurant-db
-      PGDATABASE: ${PGDATABASE}
-      PGUSER: ${PGUSER}
-      PGPASSWORD: ${PGPASSWORD}
-      PGPORT: "5432"
+      - PGHOST=restaurant-db
+      - PGDATABASE=${PGDATABASE}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGPORT=${PGPORT:-5432}
+    networks:
+      - restaurant-network
     depends_on:
       restaurant-db:
         condition: service_healthy
     restart: unless-stopped
-    networks:
-      - restaurant-network
 
   restaurant-db:
     image: postgres:15-alpine
+    container_name: restaurant-db
     environment:
       POSTGRES_DB: ${PGDATABASE}
       POSTGRES_USER: ${PGUSER}
@@ -26,17 +27,18 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PGUSER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
     networks:
       - restaurant-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER} -d ${PGDATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
 
 volumes:
   db-data:
+    driver: local
 
 networks:
   restaurant-network:
