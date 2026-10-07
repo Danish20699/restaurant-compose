@@ -14,188 +14,310 @@ try {
 } catch (PDOException $e) {
     $error = $e->getMessage();
 }
+
+// Curated high-res culinary photography mappings
+$dish_images = [
+    'Garlic Bread'         => 'https://images.unsplash.com/photo-1619860860774-1e2e17343432?w=700&auto=format&fit=crop&q=80',
+    'Caesar Salad'         => 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=700&auto=format&fit=crop&q=80',
+    'Soup of the Day'      => 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=700&auto=format&fit=crop&q=80',
+    'Grilled Chicken'      => 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=700&auto=format&fit=crop&q=80',
+    'Lamb Biryani'         => 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=700&auto=format&fit=crop&q=80',
+    'Paneer Tikka Masala'  => 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=700&auto=format&fit=crop&q=80',
+    'Fish and Chips'       => 'https://images.unsplash.com/photo-1579208570378-8c970854bc23?w=700&auto=format&fit=crop&q=80',
+    'Tiramisu'             => 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=700&auto=format&fit=crop&q=80',
+    'Gulab Jamun'          => 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=700&auto=format&fit=crop&q=80',
+    'Masala Chai'          => 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=700&auto=format&fit=crop&q=80',
+    'Fresh Lime Soda'      => 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=700&auto=format&fit=crop&q=80',
+];
+$fallback_image = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&auto=format&fit=crop&q=80';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourmet Bistro — Artisan Cuisine</title>
+    <title>Gourmet Bistro — Michelin Experience</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090a0f;
-            --card-bg: rgba(22, 27, 34, 0.75);
-            --border-glow: rgba(212, 175, 55, 0.2);
-            --gold: #d4af37;
-            --gold-light: #f3e5ab;
-            --text-main: #f0f3f6;
-            --text-muted: #8b949e;
+            --bg-deep: #08090d;
+            --bg-card: rgba(18, 21, 28, 0.85);
+            --gold: #dfb15b;
+            --gold-light: #f7e2a9;
+            --gold-gradient: linear-gradient(135deg, #dfb15b 0%, #ecd08e 50%, #b88b32 100%);
+            --text-main: #f3f5f8;
+            --text-muted: #9aa4b2;
+            --border-subtle: rgba(223, 177, 91, 0.18);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at top center, #161b22 0%, var(--bg-dark) 100%);
+            background-color: var(--bg-deep);
             color: var(--text-main);
             min-height: 100vh;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        header {
-            padding: 4rem 2rem 3rem;
+        /* Ambient Hero Banner */
+        .hero {
+            position: relative;
+            padding: 5.5rem 2rem 4.5rem;
             text-align: center;
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, transparent 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: 
+                radial-gradient(circle at center, rgba(223, 177, 91, 0.08) 0%, transparent 65%),
+                linear-gradient(180deg, rgba(8, 9, 13, 0.4) 0%, var(--bg-deep) 100%),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&auto=format&fit=crop&q=80') center/cover no-repeat;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .header-tag {
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 4px;
-            color: var(--gold);
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-        }
-
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff 40%, var(--gold-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-style: italic;
-            font-size: 1.15rem;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .status-pill {
+        .michelin-tag {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            padding: 0.45rem 1.2rem;
+            gap: 0.6rem;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 5px;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            padding: 0.35rem 1.2rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            background: rgba(223, 177, 91, 0.06);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.8rem;
+            line-height: 1.1;
+        }
+
+        .hero-desc {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.45rem;
+            color: var(--text-muted);
+            font-style: italic;
+            max-width: 650px;
+            margin: 0 auto 1.8rem;
+        }
+
+        /* Cluster Status Indicator */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 1.3rem;
             border-radius: 999px;
             font-size: 0.82rem;
             font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
         }
 
-        .status-pill.online {
-            background: rgba(16, 185, 129, 0.15);
+        .status-badge.online {
+            background: rgba(16, 185, 129, 0.12);
             color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.3);
+            border: 1px solid rgba(52, 211, 153, 0.35);
         }
 
-        .status-pill.offline {
-            background: rgba(239, 68, 68, 0.15);
+        .status-badge.offline {
+            background: rgba(239, 68, 68, 0.12);
             color: #f87171;
-            border: 1px solid rgba(248, 113, 113, 0.3);
+            border: 1px solid rgba(248, 113, 113, 0.35);
         }
 
-        .dot {
-            width: 8px;
-            height: 8px;
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
             background: currentColor;
-            box-shadow: 0 0 10px currentColor;
+            position: relative;
         }
 
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1.5px solid currentColor;
+            animation: pulse 2s infinite ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Container & Categories */
         main {
-            max-width: 1100px;
-            margin: 3.5rem auto;
+            max-width: 1200px;
+            margin: 3.5rem auto 5rem;
             padding: 0 2rem;
         }
 
-        .category-section {
-            margin-bottom: 4rem;
+        .category-group {
+            margin-bottom: 5rem;
         }
 
         .category-header {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
+            margin-bottom: 2.2rem;
         }
 
         .category-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
             color: var(--gold-light);
+            font-weight: 700;
             white-space: nowrap;
         }
 
-        .category-line {
+        .category-separator {
             height: 1px;
             width: 100%;
-            background: linear-gradient(90deg, var(--gold) 0%, rgba(212, 175, 55, 0.1) 70%, transparent 100%);
+            background: linear-gradient(90deg, var(--gold) 0%, rgba(223, 177, 91, 0.1) 70%, transparent 100%);
         }
 
+        /* Culinary Grid & Cards */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.8rem;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2.2rem;
         }
 
-        .menu-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 16px;
-            padding: 1.6rem;
-            backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glow);
-            box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
-        }
-
-        .card-top {
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            overflow: hidden;
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 1rem;
-            margin-bottom: 0.8rem;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
 
-        .item-name {
-            font-size: 1.25rem;
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(223, 177, 91, 0.5);
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 0 0 25px rgba(223, 177, 91, 0.15);
+        }
+
+        .card-image-wrap {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: #111;
+        }
+
+        .card-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover .card-image-wrap img {
+            transform: scale(1.08);
+        }
+
+        .price-pill {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            background: rgba(8, 9, 13, 0.88);
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Cormorant Garamond', serif;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-body {
+            padding: 1.6rem 1.6rem 1.8rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .dish-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
             font-weight: 700;
             color: #ffffff;
+            margin-bottom: 0.5rem;
         }
 
-        .item-price {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--gold);
-        }
-
-        .item-desc {
+        .dish-desc {
             color: var(--text-muted);
             font-size: 0.92rem;
-            line-height: 1.5;
+            line-height: 1.55;
+            flex-grow: 1;
         }
 
+        .card-footer {
+            margin-top: 1.3rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-artisan {
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .order-hint {
+            font-size: 0.8rem;
+            color: #6ee7b7;
+            font-weight: 500;
+        }
+
+        /* Footer */
         footer {
             text-align: center;
-            padding: 3rem 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: #57606a;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(8, 9, 13, 0.95);
+        }
+
+        .footer-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--gold-light);
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-credit {
+            color: var(--text-muted);
             font-size: 0.88rem;
         }
 
-        .chef-badge {
+        .devops-badge {
             color: var(--gold);
             font-weight: 600;
         }
@@ -203,20 +325,20 @@ try {
 </head>
 <body>
 
-<header>
-    <div class="header-tag">Michelin Star Experience</div>
+<header class="hero">
+    <div class="michelin-tag">★ 3-Star Culinary Haute Cuisine</div>
     <h1>Gourmet Bistro</h1>
-    <p class="subtitle">Artisanal Dining &amp; Fine Culinary Masterpieces</p>
-    
+    <p class="hero-desc">Artisanal Dining &amp; Epicurean Gastronomy Crafted with Passion</p>
+
     <?php if ($conn): ?>
-        <div class="status-pill online">
-            <span class="dot"></span>
+        <div class="status-badge online">
+            <span class="pulse-dot"></span>
             <span>PostgreSQL Active (Cluster Healthy)</span>
         </div>
     <?php else: ?>
-        <div class="status-pill offline">
-            <span class="dot"></span>
-            <span>Database Error: <?= htmlspecialchars($error) ?></span>
+        <div class="status-badge offline">
+            <span class="pulse-dot"></span>
+            <span>Cluster Error: <?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 </header>
@@ -226,36 +348,49 @@ try {
     $cats = $conn->query("SELECT id, name FROM categories ORDER BY display_order");
     while ($cat = $cats->fetch(PDO::FETCH_ASSOC)):
 ?>
-    <section class="category-section">
+    <section class="category-group">
         <div class="category-header">
             <h2 class="category-title"><?= htmlspecialchars($cat['name']) ?></h2>
-            <div class="category-line"></div>
+            <div class="category-separator"></div>
         </div>
-        
+
         <div class="menu-grid">
             <?php
             $items = $conn->prepare("SELECT name, description, price FROM menu_items WHERE category_id = ? AND is_available = true ORDER BY id");
             $items->execute([$cat['id']]);
             while ($item = $items->fetch(PDO::FETCH_ASSOC)):
+                $photo = $dish_images[$item['name']] ?? $fallback_image;
             ?>
-            <article class="menu-card">
-                <div class="card-top">
-                    <h3 class="item-name"><?= htmlspecialchars($item['name']) ?></h3>
-                    <div class="item-price">$<?= number_format($item['price'], 2) ?></div>
+            <article class="card">
+                <div class="card-image-wrap">
+                    <img src="<?= htmlspecialchars($photo) ?>" alt="<?= htmlspecialchars($item['name']) ?>" loading="lazy">
+                    <div class="price-pill">$<?= number_format($item['price'], 2) ?></div>
                 </div>
-                <p class="item-desc"><?= htmlspecialchars($item['description']) ?></p>
+                <div class="card-body">
+                    <h3 class="dish-name"><?= htmlspecialchars($item['name']) ?></h3>
+                    <p class="dish-desc"><?= htmlspecialchars($item['description']) ?></p>
+                    <div class="card-footer">
+                        <span class="badge-artisan">Chef Crafted</span>
+                        <span class="order-hint">In Stock</span>
+                    </div>
+                </div>
             </article>
             <?php endwhile; ?>
         </div>
     </section>
 <?php endwhile;
 else: ?>
-    <p style="text-align: center; color: var(--text-muted); padding: 4rem;">Menu temporarily unavailable.</p>
+    <p style="text-align: center; color: var(--text-muted); padding: 5rem; font-size: 1.2rem;">
+        Menu temporarily unavailable while connecting to database.
+    </p>
 <?php endif; ?>
 </main>
 
 <footer>
-    Gourmet Bistro &bull; Orchestrated by <span class="chef-badge">Danish Nazir</span> &bull; MLOps &amp; DevOps Engineering
+    <div class="footer-brand">Gourmet Bistro</div>
+    <p class="footer-credit">
+        DevOps &amp; Continuous Deployment Architecture by <span class="devops-badge">Danish Nazir</span> &bull; MLOps APR26
+    </p>
 </footer>
 
 </body>
