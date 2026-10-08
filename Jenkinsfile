@@ -19,8 +19,8 @@ pipeline {
                         sh "echo \$PASS | docker login -u \$USER --password-stdin"
                         
                         // Build & Push single image artifact for both environments
-                        sh "docker build -t ${DOCKER_USER}/${APP_NAME}:v${TAG} ."
-                        sh "docker push ${DOCKER_USER}/${APP_NAME}:v${TAG}"
+                        sh "docker build -t ${DOCKER_USER}/restaurant-app:v${TAG} ."
+                        sh "docker push ${DOCKER_USER}/restaurant-app:v${TAG}"
                     }
                 }
             }
@@ -46,13 +46,8 @@ EOF
         stage('Deploy to Staging') {
             steps {
                 sshagent([SSH_CREDS_ID]) {
-                    // 1. create directory in staging
                     sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} 'mkdir -p ~/${APP_NAME}'"
-                    
-                    // 2. Transfer fresh compose, .env, and db/ directory
                     sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${STAGING_IP}:~/${APP_NAME}/"
-                    
-                    // 3. run compose
                     sh """
                         ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} '
                             cd ~/${APP_NAME}
