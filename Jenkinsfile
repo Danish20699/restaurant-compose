@@ -8,6 +8,7 @@ pipeline {
         DOCKER_CREDS_ID = "docker-hub-pat"
         SSH_CREDS_ID = "vm-ssh-key"
         TAG = "${env.BUILD_NUMBER}"
+        APP_NAME = "restaurant-app"
     }
 
     stages {
@@ -18,8 +19,8 @@ pipeline {
                         sh "echo \$PASS | docker login -u \$USER --password-stdin"
                         
                         // Build & Push single image artifact for both environments
-                        sh "docker build -t ${DOCKER_USER}/restaurant-app:v${TAG} ."
-                        sh "docker push ${DOCKER_USER}/restaurant-app:v${TAG}"
+                        sh "docker build -t ${DOCKER_USER}/${APP_NAME}:v${TAG} ."
+                        sh "docker push ${DOCKER_USER}/${APP_NAME}:v${TAG}"
                     }
                 }
             }
@@ -45,21 +46,20 @@ EOF
         stage('Deploy to Staging') {
             steps {
                 sshagent([SSH_CREDS_ID]) {
-                    // 1. Remove remote db directory to ensure clean folder creation
-                    sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} 'rm -rf ~/db'"
+                    // 1. create directory in staging
+                    sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} 'mkdir -p ~/${APP_NAME}'"
                     
                     // 2. Transfer fresh compose, .env, and db/ directory
-                    sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${STAGING_IP}:~/"
+                    sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${STAGING_IP}:~/${APP_NAME}/"
                     
+                    // 3. run compose
                     sh """
                         ssh -o StrictHostKeyChecking=no ${VM_USER}@${STAGING_IP} '
-                            docker rm -f restaurant-db restaurant-web restaurant-app 2>/dev/null || true
-                            docker volume rm verjenkins_db-data 2>/dev/null || true
-                            
+                            cd ~/${APP_NAME}
                             export TAG=${TAG}
                             export DOCKER_USER=${DOCKER_USER}
-                            docker compose pull
-                            docker compose up -d --remove-orphans
+                            docker compose -p ${APP_NAME} pull
+                            docker compose -p ${APP_NAME} up -d --remove-orphans --force-recreate
                         '
                     """
                 }
@@ -75,16 +75,15 @@ EOF
         stage('Deploy to Production') {
             steps {
                 sshagent([SSH_CREDS_ID]) {
-                    sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${PROD_IP} 'rm -rf ~/db'"
-                    sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${PROD_IP}:~/"
+                    sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${PROD_IP} 'mkdir -p ~/${APP_NAME}'"
+                    sh "scp -r -o StrictHostKeyChecking=no docker-compose.yml .env db ${VM_USER}@${PROD_IP}:~/${APP_NAME}/"
                     sh """
                         ssh -o StrictHostKeyChecking=no ${VM_USER}@${PROD_IP} '
-                            docker rm -f restaurant-db restaurant-web restaurant-app 2>/dev/null || true
-                            
+                            cd ~/${APP_NAME}
                             export TAG=${TAG}
                             export DOCKER_USER=${DOCKER_USER}
-                            docker compose pull
-                            docker compose up -d --remove-orphans
+                            docker compose -p ${APP_NAME} pull
+                            docker compose -p ${APP_NAME} up -d --remove-orphans --force-recreate
                         '
                     """
                 }
