@@ -14,331 +14,433 @@ try {
 } catch (PDOException $e) {
     $error = $e->getMessage();
 }
-
-// Curated high-res culinary photography mappings
-$dish_images = [
-    'Garlic Bread'         => 'https://images.unsplash.com/photo-1619860860774-1e2e17343432?w=700&auto=format&fit=crop&q=80',
-    'Caesar Salad'         => 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=700&auto=format&fit=crop&q=80',
-    'Soup of the Day'      => 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=700&auto=format&fit=crop&q=80',
-    'Grilled Chicken'      => 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=700&auto=format&fit=crop&q=80',
-    'Lamb Biryani'         => 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=700&auto=format&fit=crop&q=80',
-    'Paneer Tikka Masala'  => 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=700&auto=format&fit=crop&q=80',
-    'Fish and Chips'       => 'https://images.unsplash.com/photo-1579208570378-8c970854bc23?w=700&auto=format&fit=crop&q=80',
-    'Tiramisu'             => 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=700&auto=format&fit=crop&q=80',
-    'Gulab Jamun'          => 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=700&auto=format&fit=crop&q=80',
-    'Masala Chai'          => 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=700&auto=format&fit=crop&q=80',
-    'Fresh Lime Soda'      => 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=700&auto=format&fit=crop&q=80',
-];
-$fallback_image = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&auto=format&fit=crop&q=80';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourmet Bistro — Michelin Experience</title>
+    <title>Gourmet Bistro — Artisan Cuisine</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-deep: #08090d;
-            --bg-card: rgba(18, 21, 28, 0.85);
-            --gold: #dfb15b;
-            --gold-light: #f7e2a9;
-            --gold-gradient: linear-gradient(135deg, #dfb15b 0%, #ecd08e 50%, #b88b32 100%);
-            --text-main: #f3f5f8;
-            --text-muted: #9aa4b2;
-            --border-subtle: rgba(223, 177, 91, 0.18);
+            --bg: #f7f4ed;
+            --surface: #fffdf8;
+            --text: #26271f;
+            --muted: #77776d;
+            --accent: #8a5936;
+            --accent-dark: #63402a;
+            --line: #ded7ca;
+            --gold: #b38b50;
+            --green: #287653;
+            --red: #b83c36;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-deep);
-            color: var(--text-main);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
             min-height: 100vh;
-            line-height: 1.6;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Ambient Hero Banner */
-        .hero {
+        /* Hero */
+        header {
             position: relative;
-            padding: 5.5rem 2rem 4.5rem;
+            isolation: isolate;
+            overflow: hidden;
+            min-height: 470px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 90px 24px 78px;
             text-align: center;
-            background: 
-                radial-gradient(circle at center, rgba(223, 177, 91, 0.08) 0%, transparent 65%),
-                linear-gradient(180deg, rgba(8, 9, 13, 0.4) 0%, var(--bg-deep) 100%),
-                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&auto=format&fit=crop&q=80') center/cover no-repeat;
-            border-bottom: 1px solid var(--border-subtle);
+            color: #fffaf1;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(24, 24, 19, 0.52),
+                    rgba(24, 24, 19, 0.78)
+                ),
+                url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=2000&q=85')
+                center 55% / cover no-repeat;
         }
 
-        .michelin-tag {
+        header::after {
+            content: "";
+            position: absolute;
+            inset: 14px;
+            border: 1px solid rgba(255, 250, 241, 0.24);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .header-tag {
             display: inline-flex;
             align-items: center;
-            gap: 0.6rem;
-            text-transform: uppercase;
-            font-size: 0.78rem;
-            letter-spacing: 5px;
-            color: var(--gold);
+            gap: 12px;
+            margin-bottom: 22px;
+            color: #e7c796;
+            font-size: 11px;
             font-weight: 700;
-            margin-bottom: 1.2rem;
-            padding: 0.35rem 1.2rem;
-            border: 1px solid var(--border-subtle);
-            border-radius: 999px;
-            background: rgba(223, 177, 91, 0.06);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .header-tag::before,
+        .header-tag::after {
+            content: "";
+            width: 26px;
+            height: 1px;
+            background: #c5a16c;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 500;
+            line-height: 1.08;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            color: #fffaf1;
+        }
+
+        .subtitle {
+            max-width: 560px;
+            color: rgba(255, 250, 241, 0.83);
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-style: italic;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: 30px;
+            padding: 9px 15px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
             backdrop-filter: blur(8px);
         }
 
-        .hero h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 4.8rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff 30%, var(--gold-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.8rem;
-            line-height: 1.1;
+        .status-pill.online {
+            color: #c4f0d7;
+            background: rgba(24, 88, 58, 0.55);
+            border: 1px solid rgba(150, 224, 180, 0.35);
         }
 
-        .hero-desc {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.45rem;
-            color: var(--text-muted);
-            font-style: italic;
-            max-width: 650px;
-            margin: 0 auto 1.8rem;
+        .status-pill.offline {
+            color: #ffd4ce;
+            background: rgba(135, 37, 31, 0.55);
+            border: 1px solid rgba(255, 170, 160, 0.35);
+            max-width: 100%;
+            overflow-wrap: anywhere;
         }
 
-        /* Cluster Status Indicator */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.5rem 1.3rem;
-            border-radius: 999px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-        }
-
-        .status-badge.online {
-            background: rgba(16, 185, 129, 0.12);
-            color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.35);
-        }
-
-        .status-badge.offline {
-            background: rgba(239, 68, 68, 0.12);
-            color: #f87171;
-            border: 1px solid rgba(248, 113, 113, 0.35);
-        }
-
-        .pulse-dot {
-            width: 9px;
-            height: 9px;
+        .dot {
+            width: 7px;
+            height: 7px;
+            flex-shrink: 0;
             border-radius: 50%;
             background: currentColor;
-            position: relative;
         }
 
-        .pulse-dot::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 1.5px solid currentColor;
-            animation: pulse 2s infinite ease-out;
+        .online .dot {
+            box-shadow: 0 0 9px rgba(150, 224, 180, 0.65);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.6); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
-        }
-
-        /* Container & Categories */
+        /* Menu content */
         main {
-            max-width: 1200px;
-            margin: 3.5rem auto 5rem;
-            padding: 0 2rem;
+            width: min(1160px, 100%);
+            margin: 0 auto;
+            padding: 82px 30px 95px;
         }
 
-        .category-group {
-            margin-bottom: 5rem;
+        .category-section {
+            margin-bottom: 76px;
+        }
+
+        .category-section:last-child {
+            margin-bottom: 0;
         }
 
         .category-header {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2.2rem;
+            gap: 22px;
+            margin-bottom: 30px;
         }
 
         .category-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.5rem;
-            color: var(--gold-light);
-            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 500;
+            line-height: 1.2;
+            color: var(--text);
+            flex-shrink: 0;
+        }
+
+        .category-line {
+            width: 100%;
+            height: 1px;
+            background: var(--line);
+            position: relative;
+        }
+
+        .category-line::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: -1px;
+            width: 42px;
+            height: 3px;
+            background: var(--gold);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            padding: 28px 30px;
+            background: var(--surface);
+            border: 1px solid #e9e2d7;
+            border-radius: 4px;
+            transition:
+                transform 220ms ease,
+                box-shadow 220ms ease,
+                border-color 220ms ease;
+        }
+
+        .menu-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            background: var(--accent);
+            transition: height 220ms ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            border-color: #d6c4ac;
+            box-shadow: 0 15px 35px rgba(59, 43, 27, 0.07);
+        }
+
+        .menu-card:hover::before {
+            height: 100%;
+        }
+
+        .card-top {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 12px;
+        }
+
+        .item-name {
+            min-width: 0;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text);
+        }
+
+        .item-price {
+            flex-shrink: 0;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
             white-space: nowrap;
         }
 
-        .category-separator {
-            height: 1px;
-            width: 100%;
-            background: linear-gradient(90deg, var(--gold) 0%, rgba(223, 177, 91, 0.1) 70%, transparent 100%);
+        .item-desc {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
         }
 
-        /* Culinary Grid & Cards */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 2.2rem;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(223, 177, 91, 0.5);
-            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 0 0 25px rgba(223, 177, 91, 0.15);
-        }
-
-        .card-image-wrap {
-            position: relative;
-            height: 220px;
-            overflow: hidden;
-            background: #111;
-        }
-
-        .card-image-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .card:hover .card-image-wrap img {
-            transform: scale(1.08);
-        }
-
-        .price-pill {
-            position: absolute;
-            bottom: 14px;
-            right: 14px;
-            background: rgba(8, 9, 13, 0.88);
-            border: 1px solid var(--gold);
-            color: var(--gold-light);
-            padding: 0.35rem 0.9rem;
-            border-radius: 999px;
+        /* Database fallback */
+        main > p {
+            padding: 65px 20px !important;
+            color: var(--muted) !important;
             font-size: 1rem;
-            font-weight: 700;
-            font-family: 'Cormorant Garamond', serif;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .card-body {
-            padding: 1.6rem 1.6rem 1.8rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .dish-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-        }
-
-        .dish-desc {
-            color: var(--text-muted);
-            font-size: 0.92rem;
-            line-height: 1.55;
-            flex-grow: 1;
-        }
-
-        .card-footer {
-            margin-top: 1.3rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .badge-artisan {
-            text-transform: uppercase;
-            font-size: 0.72rem;
-            letter-spacing: 1.5px;
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .order-hint {
-            font-size: 0.8rem;
-            color: #6ee7b7;
-            font-weight: 500;
         }
 
         /* Footer */
         footer {
+            padding: 38px 20px;
             text-align: center;
-            padding: 4rem 2rem;
-            border-top: 1px solid var(--border-subtle);
-            background: rgba(8, 9, 13, 0.95);
+            color: #d5cabb;
+            background: #28271f;
+            border-top: 3px solid var(--gold);
+            font-size: 0.82rem;
+            letter-spacing: 0.3px;
         }
 
-        .footer-brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
-            color: var(--gold-light);
-            margin-bottom: 0.4rem;
+        .chef-badge {
+            color: #e3bd83;
+            font-weight: 700;
         }
 
-        .footer-credit {
-            color: var(--text-muted);
-            font-size: 0.88rem;
+        /* Responsive layout */
+        @media (max-width: 760px) {
+            header {
+                min-height: 410px;
+                padding: 75px 25px 65px;
+            }
+
+            h1 {
+                letter-spacing: -1px;
+            }
+
+            main {
+                padding: 60px 22px 70px;
+            }
+
+            .category-section {
+                margin-bottom: 55px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .menu-card {
+                padding: 24px;
+            }
+
+            .category-header {
+                gap: 15px;
+                margin-bottom: 23px;
+            }
         }
 
-        .devops-badge {
-            color: var(--gold);
-            font-weight: 600;
+        @media (max-width: 420px) {
+            header {
+                min-height: 370px;
+                padding: 65px 20px 55px;
+            }
+
+            header::after {
+                inset: 9px;
+            }
+
+            .header-tag {
+                gap: 8px;
+                font-size: 9px;
+                letter-spacing: 2.5px;
+            }
+
+            .header-tag::before,
+            .header-tag::after {
+                width: 17px;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .status-pill {
+                font-size: 10px;
+                padding: 8px 10px;
+            }
+
+            main {
+                padding: 45px 16px 55px;
+            }
+
+            .category-title {
+                font-size: 1.65rem;
+                white-space: normal;
+            }
+
+            .menu-card {
+                padding: 21px 18px;
+            }
+
+            .card-top {
+                gap: 10px;
+            }
+
+            .item-name {
+                font-size: 1.1rem;
+            }
+
+            .item-price {
+                font-size: 1.05rem;
+            }
+
+            .item-desc {
+                font-size: 0.86rem;
+            }
+
+            footer {
+                padding: 30px 18px;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
 
-<header class="hero">
-    <div class="michelin-tag">★ 3-Star Culinary Haute Cuisine</div>
+<header>
+    <div class="header-tag">Michelin Star Experience</div>
     <h1>Gourmet Bistro</h1>
-    <p class="hero-desc">Artisanal Dining &amp; Epicurean Gastronomy Crafted with Passion</p>
+    <p class="subtitle">Artisanal Dining &amp; Fine Culinary Masterpieces</p>
 
     <?php if ($conn): ?>
-        <div class="status-badge online">
-            <span class="pulse-dot"></span>
+        <div class="status-pill online">
+            <span class="dot"></span>
             <span>PostgreSQL Active (Cluster Healthy)</span>
         </div>
     <?php else: ?>
-        <div class="status-badge offline">
-            <span class="pulse-dot"></span>
-            <span>Cluster Error: <?= htmlspecialchars($error) ?></span>
+        <div class="status-pill offline">
+            <span class="dot"></span>
+            <span>Database Error: <?= htmlspecialchars($error) ?></span>
         </div>
     <?php endif; ?>
 </header>
@@ -348,10 +450,10 @@ $fallback_image = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?
     $cats = $conn->query("SELECT id, name FROM categories ORDER BY display_order");
     while ($cat = $cats->fetch(PDO::FETCH_ASSOC)):
 ?>
-    <section class="category-group">
+    <section class="category-section">
         <div class="category-header">
             <h2 class="category-title"><?= htmlspecialchars($cat['name']) ?></h2>
-            <div class="category-separator"></div>
+            <div class="category-line"></div>
         </div>
 
         <div class="menu-grid">
@@ -359,38 +461,27 @@ $fallback_image = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?
             $items = $conn->prepare("SELECT name, description, price FROM menu_items WHERE category_id = ? AND is_available = true ORDER BY id");
             $items->execute([$cat['id']]);
             while ($item = $items->fetch(PDO::FETCH_ASSOC)):
-                $photo = $dish_images[$item['name']] ?? $fallback_image;
             ?>
-            <article class="card">
-                <div class="card-image-wrap">
-                    <img src="<?= htmlspecialchars($photo) ?>" alt="<?= htmlspecialchars($item['name']) ?>" loading="lazy">
-                    <div class="price-pill">$<?= number_format($item['price'], 2) ?></div>
+            <article class="menu-card">
+                <div class="card-top">
+                    <h3 class="item-name"><?= htmlspecialchars($item['name']) ?></h3>
+                    <div class="item-price">$<?= number_format($item['price'], 2) ?></div>
                 </div>
-                <div class="card-body">
-                    <h3 class="dish-name"><?= htmlspecialchars($item['name']) ?></h3>
-                    <p class="dish-desc"><?= htmlspecialchars($item['description']) ?></p>
-                    <div class="card-footer">
-                        <span class="badge-artisan">Chef Crafted</span>
-                        <span class="order-hint">In Stock</span>
-                    </div>
-                </div>
+                <p class="item-desc"><?= htmlspecialchars($item['description']) ?></p>
             </article>
             <?php endwhile; ?>
         </div>
     </section>
 <?php endwhile;
 else: ?>
-    <p style="text-align: center; color: var(--text-muted); padding: 5rem; font-size: 1.2rem;">
-        Menu temporarily unavailable while connecting to database.
-    </p>
+    <p style="text-align: center; color: var(--text-muted); padding: 4rem;">Menu temporarily unavailable.</p>
 <?php endif; ?>
 </main>
 
 <footer>
-    <div class="footer-brand">Gourmet Bistro</div>
-    <p class="footer-credit">
-        DevOps &amp; Continuous Deployment Architecture by <span class="devops-badge">Danish Nazir</span> &bull; MLOps APR26
-    </p>
+    Gourmet Bistro &bull; Orchestrated by
+    <span class="chef-badge">Danish Nazir</span>
+    &bull; MLOps &amp; DevOps Engineering
 </footer>
 
 </body>
