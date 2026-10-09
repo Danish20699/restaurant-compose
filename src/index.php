@@ -432,12 +432,7 @@ try {
     <h1>Gourmet Bistro</h1>
     <p class="subtitle">Artisanal Dining &amp; Fine Culinary Masterpieces</p>
 
-    <?php if ($conn): ?>
-        <div class="status-pill online">
-            <span class="dot"></span>
-            <span>PostgreSQL Active (Cluster Healthy)</span>
-        </div>
-    <?php else: ?>
+    <?php if (!$conn): ?>
         <div class="status-pill offline">
             <span class="dot"></span>
             <span>Database Error: <?= htmlspecialchars($error) ?></span>
